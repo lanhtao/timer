@@ -1,8 +1,9 @@
 #include <unistd.h>
-#include <stdio.h>
 #include "timer.h"
 #include "timerManager.h"
+#include <stdio.h>
 #include "Test.h"
+
 int main()
 {
 	//ModbusDataCenter center;
@@ -22,9 +23,9 @@ int main()
 	manager.addTimer(&t2);
 	manager.addTimer(&t3);
 	while(1)
-	{	
+	{
 		sleep(1);
 	}
-	
+
 	return 0;
 }

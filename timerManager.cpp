@@ -39,6 +39,19 @@ int timerManager::init()
 }
 
 /**
+*将小于2天的定时器开启定时
+*/
+void timerManager::managerTimerArray(void* userdata, int len)
+{
+	for(int i = 0; i<MAX_NUM_TIMER; i++ )
+	{
+		//如果小于2天，在此处开启定时，否则，定时器时间减 1 天。
+		//只关心定时时间小于2天的定时器
+		
+	}
+}
+
+/**
  * 开启定时器管理线程
  * 
  */
@@ -49,6 +62,9 @@ void timerManager::start()
 		m_isRunning = true;
 		active();
 	}
+	m_timerManager = new timer(24*60*60*1000,NULL,0);
+	m_timerManager->setTimerType(true,REPEAT);
+	m_timerManager->AttachTimeoutFuc(this,&timerManager::managerTimerArray);
 }
 
 /**

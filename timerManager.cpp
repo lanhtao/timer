@@ -93,15 +93,18 @@ int timerManager::addTimer(timer* t)
  */
 int timerManager::removeTimer(timer* t)
 {
-	int fd = t->getTimerfd();
+	int ret = t->stop();
+	if(ret == 0)
+	{
+		int fd = t->getTimerfd();
 
-	struct epoll_event ev;
-	ev.data.fd = fd;
-	ev.events = EPOLLIN | EPOLLET;
-	epoll_ctl(m_fd, EPOLL_CTL_DEL, fd, &ev);
+		struct epoll_event ev;
+		ev.data.fd = fd;
+		ev.events = EPOLLIN | EPOLLET;
+		epoll_ctl(m_fd, EPOLL_CTL_DEL, fd, &ev);
 
-	m_timersMap.erase(fd);
-	t->stop();
+		m_timersMap.erase(fd);
+	}
 	return 0;
 }
 
@@ -115,15 +118,23 @@ int timerManager::run()
 	{
 		if ((m_events[i].events & EPOLLERR) || (m_events[i].events & EPOLLHUP) || (!(m_events[i].events & EPOLLIN)))
 		{
-		  /* An error has occured on this fd, or the socket is not
-			 ready for reading (why were we notified then?) */
-		  printf ( "epoll error\n");
-		  close (m_events[i].data.fd);
-		  continue;
+			/* An error has occured on this fd, or the socket is not
+			   ready for reading (why were we notified then?) */
+			printf ( "epoll error\n");
+			close (m_events[i].data.fd);
+			continue;
 		}
 		std::map<int, timer*>::iterator it = m_timersMap.find(m_events[i].data.fd);
 		if (it != m_timersMap.end())
 		{
+			char buf[10];
+			int ret = 0 ;
+			/*定时器超时，需要把数据读出来，否则会出现堵塞，重复定时效果失效。读出的数据只有1个*/
+			while (ret = read(m_events[i].data.fd, buf, 10) > 0)
+			{
+                    		//read all data
+				//printf("%d\n",ret);//ret = 1
+                	}
 			//定时器时间到
 			timer* t = it->second;
 			t->emit(); //发送超时信号

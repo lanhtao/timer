@@ -4,6 +4,9 @@
 #include "common.h"
 #include "Signal.h"
 
+/*
+	如果定时器定时时间过长，interval会溢出。此时采取策略：将间隔时间大于1天的定时器暂且存在数组里
+*/
 struct timerData
 {
 	int 	timerFd;			//定时器的文件描述符
@@ -11,6 +14,16 @@ struct timerData
 	void* 	userdata;	//回调函数的数据指针
 	int   	len;		//数据长度
 };
+typedef enum 
+{
+	NIL,
+	DAY ,
+	WEEK,
+	MONTH,
+	YEAR,
+	REPEAT
+}TimerType;
+
 class timer
 {
 public:
@@ -18,8 +31,9 @@ public:
 	//年月日时间点类型定时.时间格式 2015-07-12 12:00:00
 	timer(std::string time, void* userdate, int len);
 	int getTimerfd();
+	void setTimerType(bool circle,TimerType type);
 	uint32 start();
-	void stop();
+	int  stop();
 	virtual ~timer();
 		//注册超时函数
 	template<class CLASS>
@@ -40,7 +54,9 @@ public:
 private:
 	int init();
 	timerData m_interval;
-		//信号源
+	bool m_circle ; //是否需要循环定时
+	TimerType m_type;//循环类型
+	//信号源
 	Gallant::Signal2<void* , int >  m_timeout;
 };
 

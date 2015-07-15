@@ -8,10 +8,11 @@
 #include <time.h>
 #include <string.h>
 #include "timer.h"
+#include <signal.h>
 
 //typedef int (*timer_callback)(void* userdata, int len); //user callback
 
-timer::timer(uint32 time,  void* userdata, int len)
+timer::timer(uint32 time,  void* userdata, int len):m_circle(false),m_type(NIL)
 {
 	m_interval.interval = time;
 	m_interval.userdata = userdata;
@@ -22,7 +23,7 @@ timer::timer(uint32 time,  void* userdata, int len)
 	}
 }
 
-timer::timer(std::string time, void* userdata, int len)
+timer::timer(std::string time, void* userdata, int len):m_circle(false),m_type(NIL)
 {
 	struct tm st_time;
 	unsigned long interval;
@@ -46,6 +47,8 @@ timer::timer(std::string time, void* userdata, int len)
 		printf("timer init error\n");
 	}
 }
+
+
 
 timer::~timer()
 {
@@ -75,6 +78,12 @@ int timer::init()
 	return fd;
 }
 
+void timer::setTimerType(bool circle,TimerType type)
+{
+	m_circle = circle;
+	m_type = type;
+}
+
 /**
  * 启动定时器:成功返回定时时间，失败返回-1
  *
@@ -85,13 +94,51 @@ uint32 timer::start()
 	memset(&time, 0, sizeof(time));
 	time.it_value.tv_sec =  m_interval.interval/1000;
 	time.it_value.tv_nsec = (m_interval.interval%1000) * 1000000;
+#if 1
+	if(m_circle)
+	{
+		switch(m_type)
+		{
+			case DAY:
+				time.it_interval.tv_sec  = 24*60*60*1000;
+				time.it_interval.tv_nsec = 0;
+				break;
+			case WEEK:
+				time.it_interval.tv_sec  = 7*24*60*60*1000;
+				time.it_interval.tv_nsec = 0;
+				break;
+			/*
+			case MONTH://数据太大，溢出
+				time.it_interval.tv_sec  = 30*24*60*60*1000;
+				time.it_interval.tv_nsec = 0;
+				break;
+			case YEAR://数据太大，溢出
+				time.it_interval.tv_sec  = 360*24*60*60*1000;
+				time.it_interval.tv_nsec = 0;
+				break;
+			*/
+			case REPEAT:
+				time.it_interval.tv_sec  = m_interval.interval/1000;
+				time.it_interval.tv_nsec = (m_interval.interval%1000) * 1000000;	
+				break;
+			default:
+				break;
+		}
+	}
+#endif
 	timerfd_settime(m_interval.timerFd, 0, &time, NULL);
+	
 	return m_interval.interval;
 }
 
-void  timer::stop()
+int   timer::stop()
 {
-    close(m_interval.timerFd);
+	if(!m_circle)
+	{
+	    	close(m_interval.timerFd);
+		return 0;
+	}
+	return -1;
 }
 
 int timer::getTimerfd()

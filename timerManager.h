@@ -7,7 +7,7 @@
 #include "timer.h"
 
 #define MAXEVENTS 64
-
+#define MAX_NUM_TIMER 128
 
 class timerManager:public ActiveObject
 {
@@ -21,6 +21,7 @@ public:
 private:
 	int init();
     int  run();
+	int m_timer[MAX_NUM_TIMER];
     int 	m_fd;
     bool 	m_isRunning;
     struct epoll_event *m_events;

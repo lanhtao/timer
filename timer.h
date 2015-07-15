@@ -1,6 +1,7 @@
 #ifndef SRC_TIMER_H_
 #define SRC_TIMER_H_
 #include "common.h"
+#include "Signal.h"
 
 struct timerData
 {

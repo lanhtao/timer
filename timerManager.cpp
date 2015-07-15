@@ -96,7 +96,7 @@ int timerManager::removeTimer(timer* t)
 	int fd = t->getTimerfd();
 
 	struct epoll_event ev;
-	ev.data.fd = t;
+	ev.data.fd = fd;
 	ev.events = EPOLLIN | EPOLLET;
 	epoll_ctl(m_fd, EPOLL_CTL_DEL, fd, &ev);
 

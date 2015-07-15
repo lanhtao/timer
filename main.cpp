@@ -1,15 +1,16 @@
 #include <unistd.h>
+#include <stdlib.h>
 #include "timer.h"
 #include "timerManager.h"
 #include <stdio.h>
 #include "Test.h"
 
-int main()
+int main(int argc,char** argv)
 {
 	//ModbusDataCenter center;
 	//center.start();
 	Test test;
-	timer t1(2000,NULL,1);
+	timer t1(argv[1],NULL,1);
 	t1.AttachTimeoutFuc(&test, &Test::func1);
 	timer t2(4000,NULL,1);
 	t2.AttachTimeoutFuc(&test, &Test::func2);
@@ -24,6 +25,7 @@ int main()
 	manager.addTimer(&t3);
 	while(1)
 	{
+		system("date");
 		sleep(1);
 	}
 

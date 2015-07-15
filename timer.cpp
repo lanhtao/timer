@@ -2,8 +2,11 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sys/timerfd.h>
+#include <sys/time.h>
 #include <string.h>
 #include <stdio.h>
+#include <time.h>
+#include <string.h>
 #include "timer.h"
 
 //typedef int (*timer_callback)(void* userdata, int len); //user callback
@@ -13,6 +16,31 @@ timer::timer(uint32 time,  void* userdata, int len)
 	m_interval.interval = time;
 	m_interval.userdata = userdata;
 	m_interval.len = len;
+	if(init() == -1)
+	{
+		printf("timer init error\n");
+	}
+}
+
+timer::timer(std::string time, void* userdata, int len)
+{
+	struct tm st_time;
+	unsigned long interval;
+	struct timeval now;
+	time_t scheduledTime;//预定的时间
+
+	char* str = strptime(time.c_str(), "%Y-%m-%d %H:%M:%S", &st_time);
+	if(str == NULL)
+			printf("time format error");
+	scheduledTime = mktime(&st_time);
+	gettimeofday(&now, NULL);
+	interval = scheduledTime *1000 - (now.tv_sec * 1000 + now.tv_usec/1000);
+	printf("time = %ld\n",interval);
+
+	m_interval.interval = interval;
+	m_interval.userdata = userdata;
+	m_interval.len = len;
+
 	if(init() == -1)
 	{
 		printf("timer init error\n");

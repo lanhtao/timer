@@ -1,5 +1,6 @@
 #ifndef SRC_TIMER_H_
 #define SRC_TIMER_H_
+#include <string>
 #include "common.h"
 #include "Signal.h"
 
@@ -14,6 +15,8 @@ class timer
 {
 public:
 	timer(uint32 time,  void* userdate, int len);
+	//年月日时间点类型定时.时间格式 2015-07-12 12:00:00
+	timer(std::string time, void* userdate, int len);
 	int getTimerfd();
 	uint32 start();
 	void stop();

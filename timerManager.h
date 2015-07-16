@@ -16,6 +16,7 @@ public:
     void start();
     void stop();
     int addTimer(timer* t);
+    int removeTimer(timer* t);
 	virtual ~timerManager();
 private:
 	int init();

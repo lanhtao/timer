@@ -3,10 +3,6 @@
 #include <unistd.h>
 #include "timerManager.h"
 
-typedef timer* timer_type;
-typedef int (*timer_callback)(timer_type); //user callback
-typedef int (*class_timer_callback)(void* frame, timer_type); //user callback
-
 timerManager::timerManager():ActiveObject("timerManager"),m_fd(0),m_isRunning(false),m_events(NULL)
 {
 	if(init() == -1)

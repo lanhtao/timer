@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include "timer.h"
 
-typedef int (*timer_callback)(void* userdata, int len); //user callback
+//typedef int (*timer_callback)(void* userdata, int len); //user callback
 
 timer::timer(uint32 time, void* cb, void* userdata, int len)
 {

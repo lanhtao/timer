@@ -2,7 +2,7 @@
 #define SRC_TIMER_H_
 #include "common.h"
 
-
+typedef int (*timer_callback)(void* userdata, int len); //user callback
 struct timerData
 {
 	int 	timerFd;			//定时器的文件描述符

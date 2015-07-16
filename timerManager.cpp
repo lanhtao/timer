@@ -17,6 +17,11 @@ timerManager::~timerManager()
 	close(m_fd);
 }
 
+/**
+ * 初始化定时器：
+ * 1.创建epool文件描述符
+ * 2.创建事件集合 
+ */
 int timerManager::init()
 {
 	m_fd = epoll_create1 (0);
@@ -32,6 +37,11 @@ int timerManager::init()
 	}
 	return 0;
 }
+
+/**
+ * 开启定时器管理线程
+ * 
+ */
 void timerManager::start()
 {
 	if(!m_isRunning)
@@ -41,6 +51,9 @@ void timerManager::start()
 	}
 }
 
+/**
+ * 停止定时器管理线程
+ */
 void timerManager::stop()
 {
 	if(m_isRunning)
@@ -50,6 +63,9 @@ void timerManager::stop()
 	}
 }
 
+/**
+ * 增加定时器到epool，并开启线程进行事件监听
+ */
 int timerManager::addTimer(timer* t)
 {
 	int fd = t->getTimerfd();
@@ -71,6 +87,26 @@ int timerManager::addTimer(timer* t)
 	return 0;
 }
 
+/**
+ * 移出定时器
+ */
+int timerManager::removeTimer(timer* t)
+{
+	int fd = t->getTimerfd();
+
+	struct epoll_event ev;
+	ev.data.fd = t;
+	ev.events = EPOLLIN | EPOLLET;
+	epoll_ctl(m_fd, EPOLL_CTL_DEL, fd, &ev);
+
+	m_timersMap.erase(fd);
+	t->stop();
+	return 0;
+}
+
+/**
+ * 时间循环监听定时器事件，并执行定时器回调
+ */
 int timerManager::run()
 {
 	int nfds = epoll_wait (m_fd, m_events, MAXEVENTS, -1);
@@ -87,8 +123,10 @@ int timerManager::run()
 		std::map<int, timer*>::iterator it = m_timersMap.find(m_events[i].data.fd);
 		if (it != m_timersMap.end())
 		{
+			//定时器时间到
 			timer* t = it->second;
-			t->exec();
+			t->exec(); //执行回调函数
+			removeTimer(t);
 		}
 	}
 	return 0;

@@ -5,7 +5,7 @@
 struct timerData
 {
 	int 	timerFd;			//定时器的文件描述符
-	uint32 	interval;	//定时时间
+	uint32 	interval;	//定时时间,单位毫秒
 	void* 	userdata;	//回调函数的数据指针
 	int   	len;		//数据长度
 };

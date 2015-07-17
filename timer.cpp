@@ -8,10 +8,9 @@
 
 //typedef int (*timer_callback)(void* userdata, int len); //user callback
 
-timer::timer(uint32 time, void* cb, void* userdata, int len)
+timer::timer(uint32 time,  void* userdata, int len)
 {
 	m_interval.interval = time;
-	m_interval.cb = cb;
 	m_interval.userdata = userdata;
 	m_interval.len = len;
 	if(init() == -1)
@@ -70,14 +69,4 @@ void  timer::stop()
 int timer::getTimerfd()
 {
 	return m_interval.timerFd;
-}
-
-void* timer::getCallBack()
-{
-	return m_interval.cb;
-}
-
-void timer::exec()
-{
-	 ((timer_callback) m_interval.cb)(m_interval.userdata,m_interval.len);
 }

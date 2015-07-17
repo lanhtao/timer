@@ -64,7 +64,8 @@ void timerManager::stop()
 }
 
 /**
- * 增加定时器到epool，并开启线程进行事件监听
+ * 增加定时器到epool，并开启线程进行事件监听；
+ * 定时器实际启动的地方
  */
 int timerManager::addTimer(timer* t)
 {

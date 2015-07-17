@@ -1,29 +1,19 @@
 #include "timer.h"
 #include "timerManager.h"
 #include <stdio.h>
+#include "Test.h"
 
-int func1(void* userdata, int len)
-{
-	printf("func 1\n");
-	return 1;
-}
-
-int func2(void* userdata, int len)
-{
-	printf("func 2\n");
-	return 1;
-}
-
-int func3(void* userdata, int len)
-{
-	printf("func 3\n");
-	return 1;
-}
 int main()
 {
-  timer t1(2000,(void*)(func1),NULL,1);
-	timer t2(4000,(void*)(func2),NULL,1);
-	timer t3(10000,(void*)(func3),NULL,1);
+	//ModbusDataCenter center;
+	//center.start();
+	Test test;
+	timer t1(2000,NULL,1);
+	t1.AttachTimeoutFuc(&test, &Test::func1);
+	timer t2(4000,NULL,1);
+	t2.AttachTimeoutFuc(&test, &Test::func2);
+	timer t3(10000,NULL,1);
+	t3.AttachTimeoutFuc(&test, &Test::func3);
 	timerManager manager;
 	if(manager.addTimer(&t1))
 	{
@@ -31,5 +21,10 @@ int main()
 	}
 	manager.addTimer(&t2);
 	manager.addTimer(&t3);
+	while(1)
+	{
+		sleep(1);
+	}
+
 	return 0;
 }

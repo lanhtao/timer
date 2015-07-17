@@ -125,7 +125,7 @@ int timerManager::run()
 		{
 			//定时器时间到
 			timer* t = it->second;
-			t->exec(); //执行回调函数
+			t->emit(); //发送超时信号
 			removeTimer(t);
 		}
 	}
